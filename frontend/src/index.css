@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2F3A4A;
+  --color-secondary: #3A7D7C;
+  --color-bg-light: #F7F8FA;
+  --color-bg-dark: #0F1115;
+  --color-card-light: #FFFFFF;
+  --color-card-dark: #171A21;
+}
+
+/* Custom base styles to ensure smooth dark mode transitions */
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--color-bg-light);
+  color: #1C1C1E;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: var(--color-bg-dark);
+  color: #E6E8EB;
+}
+
+/* Smooth transition for all background and text colors */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Map specific dark mode overrides to prevent white flashes */
+.dark .leaflet-container {
+  background: var(--color-bg-dark) !important;
+}
+
+.dark .leaflet-layer,
+.dark .leaflet-control-zoom-in,
+.dark .leaflet-control-zoom-out,
+.dark .leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
