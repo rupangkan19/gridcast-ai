@@ -4,6 +4,10 @@ import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, Respon
 const ForecastChart = ({ data, selectedHour }) => {
   if (!data || data.length === 0) return null;
 
+  const assetType = data[0].asset_type;
+  const showSolar = assetType === 'solar' || assetType === 'hybrid';
+  const showWind = assetType === 'wind' || assetType === 'hybrid';
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -38,7 +42,29 @@ const ForecastChart = ({ data, selectedHour }) => {
           className="dark:fill-card-dark"
         />
 
-        {/* P50 Expected Generation */}
+        {showSolar && (
+          <Line 
+            type="monotone" 
+            dataKey="solar.p50" 
+            stroke="#FBBF24" 
+            strokeWidth={2} 
+            dot={false}
+            name="Solar"
+          />
+        )}
+
+        {showWind && (
+          <Line 
+            type="monotone" 
+            dataKey="wind.p50" 
+            stroke="#60A5FA" 
+            strokeWidth={2} 
+            dot={false}
+            name="Wind"
+          />
+        )}
+
+        {/* P50 Expected Generation (Total) */}
         <Line 
           type="monotone" 
           dataKey="total.p50" 
@@ -46,6 +72,7 @@ const ForecastChart = ({ data, selectedHour }) => {
           strokeWidth={3} 
           dot={false}
           activeDot={{ r: 6, fill: '#2563EB', stroke: '#fff', strokeWidth: 2 }}
+          name="Total Forecast"
         />
 
         {/* Selected Hour Reference */}

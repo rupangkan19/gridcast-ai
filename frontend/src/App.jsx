@@ -14,6 +14,7 @@ import Decisions from './pages/Decisions';
 import Validation from './pages/Validation';
 import Insights from './pages/Insights';
 import System from './pages/System';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/validation" element={<Validation />} />
                 <Route path="/insights" element={<Insights />} />
                 <Route path="/system" element={<System />} />
+                <Route path="/profile" element={<Profile />} />
               </Routes>
             </PageContainer>
           </div>

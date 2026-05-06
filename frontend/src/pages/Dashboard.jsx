@@ -46,18 +46,6 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Grid Operations Overview</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Real-time forecasting and uncertainty analysis.</p>
         </div>
-        
-        {/* Simple Time Slider directly in dashboard header for prototype */}
-        <div className="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 px-4 py-2 flex items-center space-x-4">
-           <span className="text-sm font-medium">Time: {selectedHour}:00</span>
-           <input 
-             type="range" 
-             min="0" max="23" 
-             value={selectedHour}
-             onChange={(e) => useForecast().setSelectedHour(parseInt(e.target.value))}
-             className="w-32 accent-blue-600"
-           />
-        </div>
       </div>
 
       {/* Top Row: Map Placeholder & Metrics */}

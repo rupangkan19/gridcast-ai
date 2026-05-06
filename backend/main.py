@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 import uvicorn
+from datetime import datetime
 
 from .data_provider import get_weather_data
 from .model import generate_forecast
@@ -10,10 +12,9 @@ from .decision_engine import simulate_decision
 
 app = FastAPI(title="GRIDCAST API", description="AI Renewable Energy Decision-Support System")
 
-# CORS setup for Vercel frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # For production, restrict this to the Vercel domain
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,18 +31,21 @@ class DecisionRequest(BaseModel):
 def health_check():
     return {"status": "operational"}
 
-@app.get("/api/forecast/{region}")
-def get_full_forecast(region: str):
+@app.get("/api/forecast/{asset_id}")
+def get_full_forecast(asset_id: str, date: Optional[str] = None):
     """
-    Returns 24h forecast, weather data, explanations, and critical moments
-    all in one payload to avoid multiple round-trips from the frontend.
+    Returns 24h forecast for a specific asset on a given date.
     """
-    weather_data = get_weather_data(region)
-    forecasts = generate_forecast(weather_data)
+    if not date:
+        date = datetime.now().strftime("%Y-%m-%d")
+        
+    weather_data = get_weather_data(asset_id, date)
+    forecasts = generate_forecast(weather_data, asset_id)
     explanations, critical_moments = generate_explanations(forecasts)
     
     return {
-        "region": region,
+        "asset_id": asset_id,
+        "date": date,
         "forecasts": forecasts,
         "explanations": explanations,
         "critical_moments": critical_moments
@@ -49,14 +53,8 @@ def get_full_forecast(region: str):
 
 @app.post("/api/simulate")
 def run_simulation(req: DecisionRequest):
-    """
-    Runs a decision simulation for a specific hour.
-    """
-    # In a real app we'd fetch just the specific hour from a DB or cache
-    weather_data = get_weather_data(req.region)
-    forecasts = generate_forecast(weather_data)
-    
-    # Find the specific hour
+    weather_data = get_weather_data(req.region, datetime.now().strftime("%Y-%m-%d"))
+    forecasts = generate_forecast(weather_data, req.region)
     hour_forecast = next((f for f in forecasts if f["hour"] == req.hour), None)
     if not hour_forecast:
         return {"error": "Hour not found"}
@@ -67,7 +65,6 @@ def run_simulation(req: DecisionRequest):
         renewable_pct=req.renewable_pct,
         load_adj=req.load_adj
     )
-    
     return result
 
 if __name__ == "__main__":

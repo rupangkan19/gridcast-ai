@@ -8,11 +8,9 @@ class WeatherData(BaseModel):
     wind_speed: float
     irradiation: float
 
-def get_weather_data(region: str) -> List[WeatherData]:
+def get_weather_data(asset_id: str, target_date: str) -> List[WeatherData]:
     """
     Abstraction layer for weather data.
-    Currently falls back to synthetic generation.
-    Future: integrate Open-Meteo API here.
     """
     from .synthetic_data import generate_synthetic_weather
-    return generate_synthetic_weather(region)
+    return generate_synthetic_weather(asset_id, target_date)

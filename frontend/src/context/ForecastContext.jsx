@@ -5,7 +5,10 @@ const ForecastContext = createContext();
 export const useForecast = () => useContext(ForecastContext);
 
 export const ForecastProvider = ({ children }) => {
-  const [selectedRegion, setSelectedRegion] = useState('Bangalore');
+  const [selectedAsset, setSelectedAsset] = useState('pavagada');
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return new Date().toISOString().split('T')[0]; // Default to today YYYY-MM-DD
+  });
   const [selectedHour, setSelectedHour] = useState(12); // Default noon
   const [forecastData, setForecastData] = useState(null);
   const [explanations, setExplanations] = useState(null);
@@ -30,7 +33,7 @@ export const ForecastProvider = ({ children }) => {
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  // Fetch data when region changes
+  // Fetch data when asset or date changes
   useEffect(() => {
     const fetchForecast = async () => {
       setIsLoading(true);
@@ -38,7 +41,7 @@ export const ForecastProvider = ({ children }) => {
       try {
         // Fallback to local API or production Render API
         const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-        const response = await fetch(`${baseUrl}/api/forecast/${selectedRegion}`);
+        const response = await fetch(`${baseUrl}/api/forecast/${selectedAsset}?date=${selectedDate}`);
         if (!response.ok) throw new Error('Failed to fetch forecast');
         const data = await response.json();
         
@@ -55,10 +58,11 @@ export const ForecastProvider = ({ children }) => {
     };
 
     fetchForecast();
-  }, [selectedRegion]);
+  }, [selectedAsset, selectedDate]);
 
   const value = {
-    selectedRegion, setSelectedRegion,
+    selectedAsset, setSelectedAsset,
+    selectedDate, setSelectedDate,
     selectedHour, setSelectedHour,
     forecastData, explanations, criticalMoments,
     isLoading, error,
