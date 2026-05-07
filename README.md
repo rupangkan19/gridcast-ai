@@ -69,3 +69,5 @@ The backend includes a `render.yaml` configuration file for zero-config deployme
 1. In Render, create a new Web Service.
 2. Connect your repository.
 3. Render will automatically detect the `render.yaml` blueprint and deploy the FastAPI backend.
+4. python -m backend.main
+5. The API will run on: `http://localhost:8000`
