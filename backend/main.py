@@ -9,8 +9,26 @@ from .data_provider import get_weather_data
 from .model import generate_forecast
 from .explain import generate_explanations
 from .decision_engine import simulate_decision
+import os
+from contextlib import asynccontextmanager
+from .train_xgboost import train_and_save
 
-app = FastAPI(title="GRIDCAST API", description="AI Renewable Energy Decision-Support System")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Train models on startup if missing
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    solar_path = os.path.join(base_dir, "models", "solar_xgboost.joblib")
+    wind_path = os.path.join(base_dir, "models", "wind_xgboost.joblib")
+    
+    if not os.path.exists(solar_path) or not os.path.exists(wind_path):
+        print("XGBoost models not found. Training models now...")
+        train_and_save()
+    else:
+        print("XGBoost models found. Skipping training.")
+        
+    yield
+
+app = FastAPI(title="GRIDCAST API", description="AI Renewable Energy Decision-Support System", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
